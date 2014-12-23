@@ -1,0 +1,15 @@
+{application, forecast,
+ [
+  {description, "API for the forecast.io weather service"},
+  {vsn, "0.0.1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib,
+                  inets,
+                  ssl,
+                  jiffy
+                 ]},
+  {env, []}
+ ]}.
+
