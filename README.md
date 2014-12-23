@@ -1,4 +1,5 @@
 forecast
 ========
 
-forecast.io wrapper
+Erlang API for the [forecast.io](https://developer.forecast.io/) weather service.
+
