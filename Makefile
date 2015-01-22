@@ -1,13 +1,13 @@
 all: deps compile
 
-compile: deps
+compile:
 	rebar compile
 
 deps:
-	test -d deps || ./rebar get-deps
+	rebar get-deps
 
 run:
-	erl -pa ebin -pa deps/*/ebin
+	rebar shell
 
 clean:
 	rebar clean
