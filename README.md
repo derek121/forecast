@@ -27,7 +27,9 @@ $ make run
 * Add `forecast` to `applications` in your `.app.src` file
 * Add URL for the repo in the `deps` in your rebar.config. For example, `{forecast, ".*", {git, "https://github.com/derek121/forecast.git"}}`
 * Ensure `FORECAST_API_KEY` is set in your environment
-* Build with relx and then running will start `forecast`, after which calls may be made
+* Run:
+  * Building with relx and then running will start `forecast`, after which calls may be made
+  * Otherwise, calling `forecast:start/0` will start `forecast`, after which calls may be made
 * Optionally load record def. Example:
   * `rr("lib/forecast-0.0.1/include/forecast.hrl").`
 
