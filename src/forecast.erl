@@ -3,7 +3,7 @@
 -export([start/0]).
 %-export([stop/0]).
 -export([get/1]).
--export([get_test/1]).
+-export([get_test/0]).
 -export([get_sample/1]).
 
 %%% Obtain weather data from https://developer.forecast.io/docs/v2
@@ -16,6 +16,8 @@
 
 -define(APP, ?MODULE).
 
+-define(API_KEY, "FORECAST_API_KEY").
+
 %%% Response
 -define(LATITUDE,                      <<"latitude">>).
 -define(LONGITUDE,                     <<"longitude">>).
@@ -23,6 +25,8 @@
 -define(OFFSET,                        <<"offset">>).
 -define(CURRENTLY,                     <<"currently">>).
 -define(MINUTELY,                      <<"minutely">>).
+-define(HOURLY,                        <<"hourly">>).
+-define(DAILY,                         <<"daily">>).
 -define(ALERTS,                        <<"alerts">>).
 -define(FLAGS,                         <<"flags">>).
 
@@ -90,18 +94,19 @@ get(Coords={{lat, _Lat}, {long, _Long}}) ->
   Body = fetch_data(Coords),
   M = jiffy:decode(Body, [return_maps]),
 
-  Currently = maps:get(?CURRENTLY, M, #{}),
-  Minutely  = maps:get(?MINUTELY,  M, #{}),
-  Hourly    = maps:get(?MINUTELY,  M, #{}),
-  Daily     = maps:get(?MINUTELY,  M, #{}),
+  Currently = maps:get(?CURRENTLY, M, empty),
+  Minutely  = maps:get(?MINUTELY,  M, empty),
+  Hourly    = maps:get(?HOURLY,    M, empty),
+  Daily     = maps:get(?DAILY,     M, empty),
   Alerts    = maps:get(?ALERTS,    M, []),
-  Flags     = maps:get(?FLAGS,     M, #{}),
+  Flags     = maps:get(?FLAGS,     M, empty),
 
   #forecast{
     latitude  = get_value(?LATITUDE,  M),
     longitude = get_value(?LONGITUDE, M),
     timezone  = get_value(?TIMEZONE,  M),
     offset    = get_value(?OFFSET,    M),
+
     currently = create_data_point(Currently),
     minutely  = create_data_block(Minutely),
     hourly    = create_data_block(Hourly),
@@ -116,7 +121,7 @@ fetch_data(Coords) ->
   Body.
 
 create_req_url({{lat, Lat}, {long, Long}}) ->
-  {ok, ApiKey} = application:get_env(forecast, api_key),
+  ApiKey = os:getenv(?API_KEY),
 
   "https://api.forecast.io/forecast/" ++ 
   ApiKey ++ "/" ++
@@ -126,7 +131,7 @@ create_req_url({{lat, Lat}, {long, Long}}) ->
 get_value(Key, M) ->
   maps:get(Key, M, undefined).
 
-create_data_point(#{}) ->
+create_data_point(empty) ->
   #data_point{};
 create_data_point(M) ->
   #data_point{
@@ -164,7 +169,7 @@ create_data_point(M) ->
     ozone                         = get_value(?OZONE, M)
   }.
 
-create_data_block(#{}) ->
+create_data_block(empty) ->
   #data_block{};
 create_data_block(Block) ->
   %% List of data point maps
@@ -185,6 +190,8 @@ create_alert(Alert) ->
     uri         = get_value(?URI,         Alert)
   }.
 
+create_flags(empty) ->
+  #flags{};
 create_flags(Flags) ->
   #flags{
     darksky_unavailable = get_value(?DARKSKY_UNAVAILABLE, Flags),
@@ -206,9 +213,7 @@ get_sample(Coords={{lat, _Lat}, {long, _Long}}) ->
   Temp    = maps:get(<<"temperature">>, maps:get(<<"currently">>, M)),
   {{timezone, Tz}, {summary, Summary}, {temp, Temp}}.
 
-get_test(Coords={{lat, _Lat}, {long, _Long}}) ->
-  Body = fetch_data(Coords),
-  jiffy:decode(Body, [return_maps]).
-
+get_test() ->
+  get({{lat, 90}, {long, 90}}).
 
 
