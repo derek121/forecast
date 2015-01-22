@@ -1,10 +1,7 @@
 -module(forecast).
 
 -export([start/0]).
-%-export([stop/0]).
 -export([get/1]).
--export([get_test/0]).
--export([get_sample/1]).
 
 %%% Obtain weather data from https://developer.forecast.io/docs/v2
 
@@ -204,16 +201,4 @@ create_flags(Flags) ->
     sources             = get_value(?SOURCES,             Flags),
     units               = get_value(?UNITS,               Flags)
   }.
-
-get_sample(Coords={{lat, _Lat}, {long, _Long}}) ->
-  M = get(Coords),
-  %% Selected sample data for the given lat/long
-  Tz      = maps:get(<<"timezone">>, M),
-  Summary = maps:get(<<"summary">>,     maps:get(<<"currently">>, M)),
-  Temp    = maps:get(<<"temperature">>, maps:get(<<"currently">>, M)),
-  {{timezone, Tz}, {summary, Summary}, {temp, Temp}}.
-
-get_test() ->
-  get({{lat, 90}, {long, 90}}).
-
 
