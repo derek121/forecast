@@ -122,8 +122,15 @@ create_req_url({{lat, Lat}, {long, Long}}) ->
 
   "https://api.forecast.io/forecast/" ++ 
   ApiKey ++ "/" ++
-  erlang:integer_to_list(Lat) ++ "," ++ 
-  erlang:integer_to_list(Long).
+  number_to_list(Lat) ++ "," ++
+  number_to_list(Long).
+
+number_to_list(Val) when erlang:is_integer(Val) ->
+  erlang:integer_to_list(Val);
+number_to_list(Val) when erlang:is_float(Val) ->
+  erlang:float_to_list(Val, [{decimals, 6}, compact]);
+number_to_list(Val) when erlang:is_list(Val) ->
+  Val.
 
 get_value(Key, M) ->
   maps:get(Key, M, undefined).
