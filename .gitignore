@@ -4,3 +4,4 @@ ebin/*.app
 *.iml
 .idea
 .rebar
+_rel/
